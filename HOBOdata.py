@@ -131,10 +131,10 @@ def begin():
 
     Celcius = ((Temperature - 32) * 5 / 9)
     radius = float(radiusIn.get())
-    Temperature_avg = statistics.mean(Temperature)
-    Temperature_error = statistics.stdev(Temperature)
-    Light_total_intensity = sum(Light)
-    Light_intensity_Error = statistics.stdev(Light)
+    Temperature_avg = np.nanmean(Temperature)
+    Temperature_error = np.nanstd(Temperature)
+    Light_total_intensity = np.nansum(Light)
+    Light_intensity_Error = np.nanstd(Light)
     Light_total_energy = (Light_total_intensity * math.pi * (radius ** 2)) / 105
 
     ############################################# NEW DF
