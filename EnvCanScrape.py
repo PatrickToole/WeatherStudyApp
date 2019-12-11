@@ -11,8 +11,9 @@ import pandas as pd
 for month in range(1, 13):
     year = 2019
     month += 0
+    station_id = 43123          #43406:Bedford Basin; 43123:Bedford Range; 6302:Bedford
 
-    climate_url = f'https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=43406&Year={year}&Month={month}&Day=9&timeframe=1&submit=Download+Data'
+    climate_url = f'https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID={station_id}&Year={year}&Month={month}&Day=9&timeframe=1&submit=Download+Data'
     month_name = ['none','01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     r = requests.get(climate_url)
     with open(f'Environment Canada {year}-{month_name[month]}.csv', 'wb') as f:
