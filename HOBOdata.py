@@ -100,6 +100,13 @@ def begin():
     Time_delta = time - time.min()
     Time_delta = Time_delta / np.timedelta64(1, 'h')
     Temperature = df.iloc[:, 2]
+    Temperature_avg = np.nanmean(Temperature)
+
+    if Temperature_avg > 25:
+        Temperature = ((Temperature - 32) * 5 / 9)
+    else:
+        Temperature = Temperature
+
 
     x = Time_delta
     y = Temperature  # ((Temperature - 32) * 5/9)     # take out conversion if temperature is in C already
@@ -120,7 +127,7 @@ def begin():
     y = Light
 
     plt.figure()
-    plt.ylim(0, 45000)
+    plt.ylim(0, np.max(Light))
     plt.xlim(0, 170)
     plt.ylabel('Light Intensity(Lux)');
     plt.xlabel('Time (hours)')
@@ -129,7 +136,7 @@ def begin():
     plt.title('Light')
     plt.savefig(fileName.rstrip('.csv') + 'lightplot')
 
-    Celcius = ((Temperature - 32) * 5 / 9)
+
     radius = float(radiusIn.get())
     Temperature_avg = np.nanmean(Temperature)
     Temperature_error = np.nanstd(Temperature)
@@ -180,8 +187,8 @@ def begin():
 
     avgAirTemp = np.nanmean(airTemp)#statistics.mean(airTemp)
     stdAirTemp = np.nanstd(airTemp)#statistics.stdev(airTemp)
-    avgWindSpeed = statistics.mean(windSpeed)
-    stdWindSpeed = statistics.stdev(windSpeed)
+    avgWindSpeed = np.nanmean(windSpeed)
+    stdWindSpeed = np.nanstd(windSpeed)
 
     workbook = xlsxwriter.Workbook(fileName.rstrip('.csv') + 'processed.xlsx', {'nan_inf_to_errors': True})######################################################
     worksheet = workbook.add_worksheet()
