@@ -165,15 +165,32 @@ def begin():
     time = df.iloc[:, 2]
     time = pd.to_datetime(time)
     temperature = df.iloc[:, 3]
-
+    temp_avg = np.mean(temperature)
     time_delta = time - time.min()
     time_delta = time_delta / np.timedelta64(1, 'h')
+
+    if temp_avg > 25:
+        temperature = ((temperature - 32) * 5 / 9)
+    else:
+        temperature = temperature
 
     plt.figure()
     x = time_delta
     y = temperature
+    if y.max() > 16:
+        y_water_max = y.max()
+    else:
+        y_water_max = 16
+
+    if y.min() < 0:
+        y_water_min = y.min()
+    else:
+        y_water_min = 0
+
     plt.ylabel('Temperature (C)')
     plt.xlabel('Time(hours)')
+    plt.ylim(y_water_min, y_water_max)
+    plt.xlim(0,170)
     plt.plot(x, y, color='blue', label='Raw')
     plt.suptitle(expName.rstrip('.csv'), fontsize=expNameFontSize)
     plt.title('Avg Water Temp')
@@ -261,8 +278,21 @@ def begin():
     plt.figure()
     x = time_delta_air
     y = air_temperature
+
+    if y.max() < 20:
+        y_air_max = 20
+    else:
+        y_air_max = y.max()
+
+    if y.min() < 0:
+        y_air_min = y.min()
+    else:
+        y_air_min = 0
+
     plt.ylabel('Temperature (C)')
     plt.xlabel('Time(hours)')
+    plt.ylim(y_air_min, y_air_max)
+    plt.xlim(0, 170)
     plt.plot(x, y, color='blue', label='Raw')
     plt.suptitle(expName.rstrip('.csv'), fontsize=expNameFontSize)
     plt.title('Avg Air Temp')
