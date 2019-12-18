@@ -9,7 +9,6 @@ import os
 
 master = tk.Tk()
 master.title('WeatherStudyApp Data Analysis')
-
 expNameFontSize = 16
 
 
@@ -141,6 +140,7 @@ def begin():
         y_light_max = 80000
     else:
         y_light_max = np.max(y)
+
     plt.figure()
     plt.ylim(0, y_light_max)
     plt.xlim(0, 170)
@@ -156,11 +156,12 @@ def begin():
     Temperature_avg = np.nanmean(Temperature)
     Temperature_error = np.nanstd(Temperature)
     Light_total_intensity = np.nansum(Light)
+    light_avg = np.nanmean(Light)
     Light_intensity_Error = np.nanstd(Light)
     Light_total_energy = (Light_total_intensity * math.pi * (radius ** 2)) / 105
 
-    ######################################
-    df = pd.read_csv('data.csv', skiprows=1)##############################
+    # Rolling water plots
+    df = pd.read_csv('data.csv', skiprows=1)
     time = df.iloc[:, 2]
     time = pd.to_datetime(time)
     temperature = df.iloc[:, 3]
@@ -186,12 +187,9 @@ def begin():
     plt.plot(x, y, color='red', label='day(previous 144 time points)')
 
     plt.legend()
-    # plt.show()
     plt.savefig('example rolling')
-    ########################################
 
     ### DF2
-
 
     df = pd.read_csv(fileName2)
 
@@ -199,7 +197,7 @@ def begin():
     Time = pd.to_datetime(Time)
     df = df[(Time >= startTime) & (Time <= endTime)]
     df.drop_duplicates(subset='Date/Time', keep='first', inplace=True)
-
+    df.to_csv('data2.csv')
     time = df.iloc[:, 4]
     time = pd.to_datetime(time)
     timeDelta = time - time.min()
@@ -251,58 +249,128 @@ def begin():
     avgWindSpeed = np.nanmean(windSpeed)
     stdWindSpeed = np.nanstd(windSpeed)
 
+    # rolling air plots
+    df = pd.read_csv('data2.csv', skiprows=1)
+    time = df.iloc[:, 5]
+    time = pd.to_datetime(time)
+    air_temperature = df.iloc[:, 10]
+
+    time_delta_air = time - time.min()
+    time_delta_air = time_delta_air / np.timedelta64(1, 'h')
+
+    plt.figure()
+    x = time_delta_air
+    y = air_temperature
+    plt.ylabel('Temperature (C)')
+    plt.xlabel('Time(hours)')
+    plt.plot(x, y, color='blue', label='Raw')
+    plt.suptitle(expName.rstrip('.csv'), fontsize=expNameFontSize)
+    plt.title('Avg Air Temp')
+
+    rolling_air_temp_hour = y.rolling(6, min_periods=1).mean()
+    rolling_air_temp_day = y.rolling(144, min_periods=1).mean()
+
+    y = rolling_air_temp_hour
+    plt.plot(x, y, color='green', label='hour(previous 6 time points)')
+    y = rolling_air_temp_day
+    plt.plot(x, y, color='red', label='day(previous 144 time points)')
+
+    plt.legend()
+    plt.savefig('rolling air temp')
+
+
+    #Workbook
+
     workbook = xlsxwriter.Workbook(fileName.rstrip('.csv') + 'processed.xlsx', {'nan_inf_to_errors': True})#
     worksheet = workbook.add_worksheet('Summary Data')
+    worksheet_2 = workbook.add_worksheet('Rolling Avg Water Temp')
+    worksheet_3 = workbook.add_worksheet('Rolling Avg Air Temp')
 
-    worksheet.write('C1', 'Stdev')
-    worksheet.write('D1', 'n value')
+    #formatting
+    time_column_format = workbook.add_format({'bg_color':'#D9D9D9', 'bold':True})
+    raw_column_format = workbook.add_format({'bg_color' : '#C5D9F1'})
+    raw_column_title_format = workbook.add_format({'bg_color': '#C5D9F1', 'bold':True})
+    hour_column_format = workbook.add_format({'bg_color': '#D8E4BC'})
+    hour_column_title_format = workbook.add_format({'bg_color': '#D8E4BC', 'bold':True})
+    day_column_format = workbook.add_format({'bg_color': '#E6B8B7'})
+    day_column_title_format = workbook.add_format({'bg_color': '#E6B8B7', 'bold':True})
+    worksheet.set_column('A:A', 25)
+    worksheet_2.set_column('A:B', 12)
+    worksheet_2.set_column('C:D', 20)
+    worksheet_3.set_column('A:B', 12)
+    worksheet_3.set_column('C:D', 20)
 
-    worksheet.write('A2', 'Average Temperature(C)')
+    #worksheet 1 writing
+
+    worksheet.write('C1', 'Stdev', time_column_format)
+    worksheet.write('D1', 'n value', time_column_format)
+
+    worksheet.write('A2', 'Average Temperature(C)', time_column_format)
     worksheet.write('B2', round((float(Temperature_avg)),1))
     worksheet.write('C2', round((float(Temperature_error)),1))
     worksheet.write('D2', len(Temperature))
 
-    worksheet.write('A3', 'Total Light Intensity (Lux)')
+    worksheet.write('A3', 'Total Light Intensity (Lux)', time_column_format)
     worksheet.write('B3', round((float(Light_total_intensity)),1))
     worksheet.write('C3', round((float(Light_intensity_Error)),1))
     worksheet.write('D3', len(Light))
 
-    worksheet.write('A4', 'Total Light Energy (W)')
-    worksheet.write('B4', round((float(Light_total_energy)),1))
+    worksheet.write('A4', 'Average Light Intensity (Lux)', time_column_format)
+    worksheet.write('B4', round((float(light_avg)), 1))
+    worksheet.write('C4', round((float(Light_intensity_Error)), 1))
     worksheet.write('D4', len(Light))
 
-    worksheet.write('A5', 'Average Air Temperature(C)')
-    worksheet.write('B5', round((float(avgAirTemp)),1))
-    worksheet.write('C5', round((float(stdAirTemp)),1))
-    worksheet.write('D5', len(airTemp))
+    worksheet.write('A5', 'Total Light Energy (W)', time_column_format)
+    worksheet.write('B5', round((float(Light_total_energy)),1))
+    worksheet.write('D5', len(Light))
 
-    worksheet.write('A6', 'Average Wind Speed(km/h)')
-    worksheet.write('B6', round((float(avgWindSpeed)),1))
-    worksheet.write('C6', round((float(stdWindSpeed)),1))
-    worksheet.write('D6', len(windSpeed))
+    worksheet.write('A6', 'Average Air Temperature(C)', time_column_format)
+    worksheet.write('B6', round((float(avgAirTemp)),1))
+    worksheet.write('C6', round((float(stdAirTemp)),1))
+    worksheet.write('D6', len(airTemp))
+
+    worksheet.write('A7', 'Average Wind Speed(km/h)', time_column_format)
+    worksheet.write('B7', round((float(avgWindSpeed)),1))
+    worksheet.write('C7', round((float(stdWindSpeed)),1))
+    worksheet.write('D7', len(windSpeed))
 
     worksheet.insert_image('E3', fileName.rstrip('.csv') + 'watertempplot.png')
     worksheet.insert_image('O3', fileName.rstrip('.csv') + 'lightplot.png')
     worksheet.insert_image('E30', fileName.rstrip('.csv') + 'airtempplot.png')
     worksheet.insert_image('O30', fileName.rstrip('.csv') + 'windspeed.png')
-    ##############################################################
 
-    worksheet_2 = workbook.add_worksheet('Rolling Avg Water Temp')
+    # worksheet 2 writing
 
-    worksheet_2.write('A1', 'Time')
-    worksheet_2.write('B1', 'Raw Temp')
-    worksheet_2.write('C1', 'Rolling Average Hourly')
-    worksheet_2.write('D1', 'Rolling Average Daily')
+    worksheet_2.write('A1', 'Time(hours)', time_column_format)
+    worksheet_2.write('B1', 'Raw Temp', raw_column_title_format)
+    worksheet_2.write('C1', 'Rolling Average Hourly', hour_column_title_format)
+    worksheet_2.write('D1', 'Rolling Average Daily', day_column_title_format)
     worksheet_2.insert_image('E3', 'example rolling.png')
 
     for item in range(len(time_delta)):
-        worksheet_2.write(item + 1, 0, time_delta[item])
-        worksheet_2.write(item + 1, 1, temperature[item])
-        worksheet_2.write(item + 1, 2, rolling_water_temp_hour[item])
-        worksheet_2.write(item + 1, 3, rolling_water_temp_day[item])
+        worksheet_2.write(item + 1, 0, round(float(time_delta[item]),2), time_column_format)
+        worksheet_2.write(item + 1, 1, round(float(temperature[item]),1), raw_column_format)
+        worksheet_2.write(item + 1, 2, round(float(rolling_water_temp_hour[item]),1), hour_column_format)
+        worksheet_2.write(item + 1, 3, round(float(rolling_water_temp_day[item]),1), day_column_format)
 
-    ######################################################
+    # worksheet 3 writing
+
+    worksheet_3.write('A1', 'Time(hours)', time_column_format)
+    worksheet_3.write('B1', 'Raw Temp', raw_column_title_format)
+    worksheet_3.write('C1', 'Rolling Average Hourly', hour_column_title_format)
+    worksheet_3.write('D1', 'Rolling Average Daily', day_column_title_format)
+    worksheet_3.insert_image('E3', 'rolling air temp.png')
+
+    for item in range(len(time_delta_air)):
+        worksheet_3.write(item + 1, 0, time_delta_air[item], time_column_format)
+        worksheet_3.write(item + 1, 1, round(float(air_temperature[item]),1), raw_column_format)
+        worksheet_3.write(item + 1, 2, round(float(rolling_air_temp_hour[item]),1), hour_column_format)
+        worksheet_3.write(item + 1, 3, round(float(rolling_air_temp_day[item]),1), day_column_format)
+
+
     workbook.close()
+
+    #cleanup
 
     os.remove(fileName.rstrip('.csv') + 'windspeed.png')
     os.remove(fileName.rstrip('.csv') + 'airtempplot.png')
@@ -310,6 +378,9 @@ def begin():
     os.remove(fileName.rstrip('.csv') + 'watertempplot.png')
     os.remove('data.csv')
     os.remove('example rolling.png')
+    os.remove('data2.csv')
+    os.remove('rolling air temp.png')
+
 begin_button = tk.Button(bottom_frame, text='Begin!', command=begin)
 begin_button.pack(pady=20, fill=tk.X)
 master.mainloop()
