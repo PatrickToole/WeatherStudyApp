@@ -54,7 +54,7 @@ w = tk.OptionMenu(master, radiusIn, smallRing, largeRing)
 w.pack(side=tk.LEFT)
 
 
-input_path = tk.Label(top_frame, text="WeatherStudyApp File:")
+input_path = tk.Label(top_frame, text="Hobo Data File:")
 input_entry = tk.Entry(top_frame, text="", width=40)
 browse1 = tk.Button(top_frame, text="Browse", command=input)
 
