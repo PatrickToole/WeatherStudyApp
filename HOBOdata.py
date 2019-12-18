@@ -31,13 +31,13 @@ top_frame = tk.Frame(master)
 bottom_frame = tk.Frame(master)
 line = tk.Frame(master, height=1, width=400, bg="grey80", relief='groove')
 
-startTimeLabel = tk.Label(top_frame, text='Start Time (yyyy-mm-dd hh:mm:ms)')
+startTimeLabel = tk.Label(top_frame, text='Start Time (yyyy-mm-dd hh:mm)')
 startTimeEntry = tk.Entry(top_frame)
 startTimeEntry.pack(side=tk.TOP)
 startTimeLabel.pack(side=tk.TOP)
 
 
-endTimeLabel = tk.Label(bottom_frame, text='end time (yyyy-mm-dd hh:mm:ms)')
+endTimeLabel = tk.Label(bottom_frame, text='end time (yyyy-mm-dd hh:mm)')
 endTimeEntry = tk.Entry(bottom_frame)
 endTimeEntry.pack(side=tk.TOP)
 endTimeLabel.pack(side=tk.TOP)
