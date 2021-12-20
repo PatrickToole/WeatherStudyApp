@@ -9,7 +9,7 @@ import pandas as pd
 #scrape website for weather station data
 
 for month in range(1, 13):
-    year = 2019
+    year = 2021
     month += 0
     station_id = 43123          #43406:Bedford Basin; 43123:Bedford Range; 6302:Bedford
 
@@ -20,23 +20,24 @@ for month in range(1, 13):
         f.write(r.content)
 
 # combine all weather station data into one file
-os.chdir('C:\\Users\\toolep\\PycharmProjects\\WeatherStudyApp')
+cwd = os.getcwd()
+os.chdir(cwd)
 
 extension = 'csv'
 all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
 
 combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames])
-combined_csv.to_csv('EnvironmentCanada2019.csv', index=False, encoding='utf-8-sig')
+combined_csv.to_csv(f'EnvironmentCanada{year}.csv', index=False, encoding='utf-8-sig')
 
-os.remove('Environment Canada 2019-01.csv')
-os.remove('Environment Canada 2019-02.csv')
-os.remove('Environment Canada 2019-03.csv')
-os.remove('Environment Canada 2019-04.csv')
-os.remove('Environment Canada 2019-05.csv')
-os.remove('Environment Canada 2019-06.csv')
-os.remove('Environment Canada 2019-07.csv')
-os.remove('Environment Canada 2019-08.csv')
-os.remove('Environment Canada 2019-09.csv')
-os.remove('Environment Canada 2019-10.csv')
-os.remove('Environment Canada 2019-11.csv')
-os.remove('Environment Canada 2019-12.csv')
+os.remove(f'Environment Canada {year}-01.csv')
+os.remove(f'Environment Canada {year}-02.csv')
+os.remove(f'Environment Canada {year}-03.csv')
+os.remove(f'Environment Canada {year}-04.csv')
+os.remove(f'Environment Canada {year}-05.csv')
+os.remove(f'Environment Canada {year}-06.csv')
+os.remove(f'Environment Canada {year}-07.csv')
+os.remove(f'Environment Canada {year}-08.csv')
+os.remove(f'Environment Canada {year}-09.csv')
+os.remove(f'Environment Canada {year}-10.csv')
+os.remove(f'Environment Canada {year}-11.csv')
+os.remove(f'Environment Canada {year}-12.csv')
