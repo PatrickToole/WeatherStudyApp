@@ -13,13 +13,13 @@ expNameFontSize = 16
 
 
 def input():
-    input_path = tk.filedialog.askopenfilename()
+    input_path = filedialog.askopenfilename()
     input_entry.delete(0, tk.END)  # Remove current text in entry
     input_entry.insert(0, input_path)  # Insert the 'path'
 
 
 def input2():
-    path = tk.filedialog.askopenfilename()
+    path = filedialog.askopenfilename()
     output_entry.delete(0, tk.END)  # Remove current text in entry
     output_entry.insert(0, path)  # Insert the 'path'
 
@@ -84,7 +84,7 @@ browse2.pack(pady=5)
 def begin():
     fileName = input_entry.get()
     fileName2 = output_entry.get()
-    df = pd.read_csv(fileName, skiprows=2)
+    df = pd.read_csv(fileName, skiprows=2, encoding='latin1')
     startTime = startTimeEntry.get()
     endTime = endTimeEntry.get()
     # DF1
@@ -213,7 +213,7 @@ def begin():
     Time = df.iloc[:, 4]
     Time = pd.to_datetime(Time)
     df = df[(Time >= startTime) & (Time <= endTime)]
-    df.drop_duplicates(subset='Date/Time', keep='first', inplace=True)
+    df.drop_duplicates(subset='Date/Time (LST)', keep='first', inplace=True)
     df.to_csv('data2.csv')
     time = df.iloc[:, 4]
     time = pd.to_datetime(time)
