@@ -11,7 +11,7 @@ import pandas as pd
 for month in range(1, 13):
     year = 2021
     month += 0
-    station_id = 43123  # 43406:Bedford Basin; 43123:Bedford Range; 6302:Bedford
+    station_id = 43406  # 43406:Bedford Basin; 43123:Bedford Range; 6302:Bedford
 
     climate_url = f'https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID={station_id}&Year={year}&Month={month}&Day=9&timeframe=1&submit=Download+Data'
     month_name = ['none', '01', '02', '03', '04',
